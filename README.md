@@ -24,3 +24,30 @@ python consumer.py
 IN OTHER TERMINAL
 cd /workspaces/prac
 python Producer.py
+
+==========================================DAG======================================================
+TERMINAL 1: SETUP
+pip install uv
+uv venv --python 3.14
+source .venv/bin/activate
+export AIRFLOW_HOME=/workspaces/AIOps/airflow
+mkdir -p $AIRFLOW_HOME/dags
+uv pip install apache-airflow
+airflow db migrate
+cd $AIRFLOW_HOME/dags
+touch aiops_dag.py
+airflow standalone
+
+TERMINAL 2: VERIFY AND RUN
+cd /workspaces/AIOps
+source .venv/bin/activate
+export AIRFLOW_HOME=/workspaces/AIOps/airflow
+
+airflow config get-value core dags_folder
+airflow dags list
+airflow dags list | grep aiops
+airflow dags list-import-errors
+
+airflow dags unpause aiops_workflow
+airflow dags trigger aiops_workflow
+airflow dags list-runs -d aiops_workflow
